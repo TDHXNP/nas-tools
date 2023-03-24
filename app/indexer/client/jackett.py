@@ -9,6 +9,13 @@ from app.helper import IndexerConf
 
 
 class Jackett(_IIndexClient):
+    # 索引器ID
+    client_id = "jackett"
+    # 索引器类型
+    client_type = IndexerType.JACKETT
+    # 索引器名称
+    client_name = IndexerType.JACKETT.value
+
     schema = "jackett"
     _client_config = {}
     index_type = IndexerType.JACKETT.value
@@ -44,7 +51,7 @@ class Jackett(_IIndexClient):
 
     @classmethod
     def match(cls, ctype):
-        return True if ctype in [cls.schema, cls.index_type] else False
+        return True if ctype in [cls.client_id, cls.client_type, cls.client_name] else False
 
     def get_indexers(self):
         """
