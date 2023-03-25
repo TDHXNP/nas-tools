@@ -31,6 +31,7 @@ class Jackett(_IIndexClient):
 
     def init_config(self):
         if self._client_config:
+            self.cookie = self._client_config.get('cookie')
             self.api_key = self._client_config.get('api_key')
             self._password = self._client_config.get('password')
             self.host = self._client_config.get('host')
@@ -62,12 +63,13 @@ class Jackett(_IIndexClient):
         :return: indexer 信息 [(indexerId, indexerName, url)]
         """
         # 获取Cookie
-        cookie = None
-        session = requests.session()
-        res = RequestUtils(session=session).post_res(url=f"{self.host}UI/Dashboard",
-                                                     params={"password": self._password})
-        if res and session.cookies:
-            cookie = session.cookies.get_dict()
+        cookies_str = self.cookie
+        cookie = dict([co.strip().split('=') for co in cookies_str.split(';')])
+        # session = requests.session()
+        # res = RequestUtils(session=session).post_res(url=f"{self.host}UI/Dashboard",
+        #                                              params={"password": self._password})
+        # if res and session.cookies:
+        #     cookie = session.cookies.get_dict()
         indexer_query_url = f"{self.host}api/v2.0/indexers?configured=true"
         try:
             ret = RequestUtils(cookies=cookie).get_res(indexer_query_url)
