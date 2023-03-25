@@ -714,11 +714,11 @@ class ModuleConf(object):
 
     # 索引器
     INDEXER_CONF = {"jackett": {
-            "name": "Jackett",
-            "img_url": "./static/imgindexer/jackett.png",
-            "background": "bg-black",
-            "test_command": "app.indexer.client.jackett|Jackett",
-            "config": {
+        "name": "Jackett",
+        "img_url": "./static/img/indexer/jackett.png",
+        "background": "bg-black",
+        "test_command": "app.indexer.client.jackett|Jackett",
+        "config": {
                 "host": {
                     "id": "jackett.host",
                     "required": True,
@@ -727,7 +727,7 @@ class ModuleConf(object):
                     "type": "text",
                     "placeholder": "http://127.0.0.1:9117"
                 },
-                "api_key": {
+            "api_key": {
                     "id": "jackett.api_key",
                     "required": True,
                     "title": "Api Key",
@@ -735,7 +735,7 @@ class ModuleConf(object):
                     "type": "text",
                     "placeholder": ""
                 },
-                "password": {
+            "password": {
                     "id": "jackett.password",
                     "required": False,
                     "title": "密码",
@@ -743,8 +743,8 @@ class ModuleConf(object):
                     "type": "password",
                     "placeholder": ""
                 }
-            }
-        }}
+        }
+    }}
 
     # 发现过滤器
     DISCOVER_FILTER_CONF = {

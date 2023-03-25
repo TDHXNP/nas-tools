@@ -23,14 +23,18 @@ class Indexer(object):
             filter_func=lambda _, obj: hasattr(obj, 'client_id')
         )
         log.debug(f"【Indexer】加载索引器：{self._indexer_schemas}")
+        log.console(f"【__init__】加载索引器：{self._indexer_schemas}")
         self.init_config()
 
     def init_config(self):
         self.progress = ProgressHelper()
         indexer = Config().get_config("pt").get('search_indexer') or 'builtin'
+        log.console(f"【init_config】加载索引器：{indexer}")
         self._client = self.__get_client(indexer)
+        log.console(f"【init_config】索引器：{self._client}")
         if self._client:
             self._client_type = self._client.get_type()
+            log.console(f"【init_config】索引器类型：{self._client_type}")
 
     def __build_class(self, ctype, conf):
         for indexer_schema in self._indexer_schemas:
@@ -137,11 +141,13 @@ class Indexer(object):
         # 计算耗时
         start_time = datetime.datetime.now()
         if filter_args and filter_args.get("site"):
-            log.info(f"【{self._client_type.value}】开始检索 %s，站点：%s ..." % (key_word, filter_args.get("site")))
+            log.info(f"【{self._client_type.value}】开始检索 %s，站点：%s ..." %
+                     (key_word, filter_args.get("site")))
             self.progress.update(ptype=ProgressKey.Search,
                                  text="开始检索 %s，站点：%s ..." % (key_word, filter_args.get("site")))
         else:
-            log.info(f"【{self._client_type.value}】开始并行检索 %s，线程数：%s ..." % (key_word, len(indexers)))
+            log.info(f"【{self._client_type.value}】开始并行检索 %s，线程数：%s ..." %
+                     (key_word, len(indexers)))
             self.progress.update(ptype=ProgressKey.Search,
                                  text="开始并行检索 %s，线程数：%s ..." % (key_word, len(indexers)))
         # 多线程

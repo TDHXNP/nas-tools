@@ -40,6 +40,9 @@ class Jackett(_IIndexClient):
                 if not self.host.endswith('/'):
                     self.host = self.host + "/"
 
+    def get_type(self):
+        return self.client_type
+
     def get_status(self):
         """
         检查连通性
