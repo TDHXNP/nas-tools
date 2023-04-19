@@ -67,6 +67,7 @@ class BuiltinIndexer(_IIndexClient):
                 continue
             render = False if not chrome_ok else site.get("chrome")
             indexer = IndexerHelper().get_indexer(url=url,
+                                                  siteid=site.get("id"),
                                                   cookie=cookie,
                                                   ua=site.get("ua"),
                                                   name=site.get("name"),
@@ -93,13 +94,17 @@ class BuiltinIndexer(_IIndexClient):
                match_media,
                in_from: SearchType):
         """
-        根据关键字多线程检索
+        根据关键字多线程搜索
         """
         if not indexer or not key_word:
             return None
         # 不是配置的索引站点过滤掉
         indexer_sites = Config().get_config("pt").get("indexer_sites") or []
         if indexer_sites and indexer.id not in indexer_sites:
+            return []
+        # 站点流控
+        if self.sites.check_ratelimit(indexer.siteid):
+            self.progress.update(ptype=ProgressKey.Search, text=f"{indexer.name} 触发站点流控，跳过 ...")
             return []
         # fix 共用同一个dict时会导致某个站点的更新全局全效
         if filter_args is None:
@@ -115,7 +120,7 @@ class BuiltinIndexer(_IIndexClient):
         # 计算耗时
         start_time = datetime.datetime.now()
 
-        log.info(f"【{self.client_name}】开始检索Indexer：{indexer.name} ...")
+        log.info(f"【{self.client_name}】开始搜索Indexer：{indexer.name} ...")
         # 特殊符号处理
         search_word = StringUtils.handler_special_chars(text=key_word,
                                                         replace_word=" ",
@@ -152,9 +157,9 @@ class BuiltinIndexer(_IIndexClient):
                                                 result='N' if error_flag else 'Y')
         # 返回结果
         if len(result_array) == 0:
-            log.warn(f"【{self.client_name}】{indexer.name} 未检索到数据")
+            log.warn(f"【{self.client_name}】{indexer.name} 未搜索到数据")
             # 更新进度
-            self.progress.update(ptype=ProgressKey.Search, text=f"{indexer.name} 未检索到数据")
+            self.progress.update(ptype=ProgressKey.Search, text=f"{indexer.name} 未搜索到数据")
             return []
         else:
             log.warn(f"【{self.client_name}】{indexer.name} 返回数据：{len(result_array)}")
@@ -170,7 +175,7 @@ class BuiltinIndexer(_IIndexClient):
 
     def list(self, index_id, page=0, keyword=None):
         """
-        根据站点ID检索站点首页资源
+        根据站点ID搜索站点首页资源
         """
         if not index_id:
             return []

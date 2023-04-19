@@ -17,9 +17,6 @@ class EventManager:
     _handlers = {}
 
     def __init__(self):
-        self.init_config()
-
-    def init_config(self):
         # 事件队列
         self._eventQueue = Queue()
         # 事件响应函数字典
@@ -82,6 +79,9 @@ class EventManager:
         def decorator(f):
             if isinstance(etype, list):
                 for et in etype:
+                    self.add_event_listener(et, f)
+            elif type(etype) == type(EventType):
+                for et in etype.__members__.values():
                     self.add_event_listener(et, f)
             else:
                 self.add_event_listener(etype, f)
