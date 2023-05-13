@@ -104,18 +104,16 @@ class Sites:
             if site_strict_url:
                 self._siteByUrls[site_strict_url] = site_info
             # 初始化站点限速器
-            if (site_note.get("limit_interval")
-                and str(site_note.get("limit_interval")).isdigit()
-                and site_note.get("limit_count")
-                and str(site_note.get("limit_count")).isdigit()) \
-                    or (site_note.get("limit_seconds")
-                        and str(site_note.get("limit_seconds")).isdigit()):
-                self._limiters[site.ID] = SiteRateLimiter(
-                    limit_interval=int(site_note.get("limit_interval")) * 60,
-                    limit_count=int(site_note.get("limit_count")),
-                    limit_seconds=int(site_note.get("limit_seconds")) if site_note.get("limit_seconds") and str(
-                        site_note.get("limit_seconds")).isdigit() else None
-                )
+            self._limiters[site.ID] = SiteRateLimiter(
+                limit_interval=int(site_note.get("limit_interval")) * 60 if site_note.get("limit_interval") and str(
+                    site_note.get("limit_interval")).isdigit() and site_note.get("limit_count") and str(
+                    site_note.get("limit_count")).isdigit() else None,
+                limit_count=int(site_note.get("limit_count")) if site_note.get("limit_interval") and str(
+                    site_note.get("limit_interval")).isdigit() and site_note.get("limit_count") and str(
+                    site_note.get("limit_count")).isdigit() else None,
+                limit_seconds=int(site_note.get("limit_seconds")) if site_note.get("limit_seconds") and str(
+                    site_note.get("limit_seconds")).isdigit() else None
+            )
 
     def init_favicons(self):
         """
@@ -171,7 +169,11 @@ class Sites:
         根据url的后缀获取站点配置
         """
         for key in self._siteByUrls:
-            if key.endswith(suffix):
+            # 使用.分割后再将最后两位(顶级域和二级域)拼起来
+            key_parts = key.split(".")
+            key_end = ".".join(key_parts[-2:])
+            # 将拼起来的结果与参数进行对比
+            if suffix == key_end:
                 return self._siteByUrls[key]
         return {}
 

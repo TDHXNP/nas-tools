@@ -173,7 +173,7 @@ class DoubanApi(object):
         headers = {'User-Agent': choice(cls._user_agents)}
         resp = RequestUtils(headers=headers, session=cls._session).get_res(url=req_url, params=params)
 
-        return resp.json() if resp else None
+        return resp.json() if resp else {}
 
     def search(self, keyword, start=0, count=20, ts=datetime.strftime(datetime.now(), '%Y%m%d')):
         return self.__invoke(self._urls["search"], q=keyword, start=start, count=count, _ts=ts)
@@ -232,10 +232,10 @@ class DoubanApi(object):
     def movie_top250(self, start=0, count=20, ts=datetime.strftime(datetime.now(), '%Y%m%d')):
         return self.__invoke(self._urls["movie_top250"], start=start, count=count, _ts=ts)
 
-    def movie_recommend(self, tags='', sort='T', start=0, count=20, ts=datetime.strftime(datetime.now(), '%Y%m%d')):
+    def movie_recommend(self, tags='', sort='R', start=0, count=20, ts=datetime.strftime(datetime.now(), '%Y%m%d')):
         return self.__invoke(self._urls["movie_recommend"], tags=tags, sort=sort, start=start, count=count, _ts=ts)
 
-    def tv_recommend(self, tags='', sort='T', start=0, count=20, ts=datetime.strftime(datetime.now(), '%Y%m%d')):
+    def tv_recommend(self, tags='', sort='R', start=0, count=20, ts=datetime.strftime(datetime.now(), '%Y%m%d')):
         return self.__invoke(self._urls["tv_recommend"], tags=tags, sort=sort, start=start, count=count, _ts=ts)
 
     def tv_chinese_best_weekly(self, start=0, count=20, ts=datetime.strftime(datetime.now(), '%Y%m%d')):

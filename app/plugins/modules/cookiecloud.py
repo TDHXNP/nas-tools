@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 from threading import Event
 
 import pytz
@@ -72,7 +72,7 @@ class CookieCloud(_IPluginModule):
                             'content': [
                                 {
                                     'id': 'server',
-                                    'placeholder': 'http://nastool.cn:8088'
+                                    'placeholder': 'https://nastool.cn/cookiecloud'
                                 }
                             ]
 
@@ -186,7 +186,8 @@ class CookieCloud(_IPluginModule):
             if self._onlyonce:
                 self.info(f"同步服务启动，立即运行一次")
                 self._scheduler.add_job(self.__cookie_sync, 'date',
-                                        run_date=datetime.now(tz=pytz.timezone(Config().get_timezone())))
+                                        run_date=datetime.now(tz=pytz.timezone(Config().get_timezone())) + timedelta(
+                                            seconds=3))
                 # 关闭一次性开关
                 self._onlyonce = False
                 self.update_config({
@@ -283,9 +284,12 @@ class CookieCloud(_IPluginModule):
             # 查询站点
             site_info = self.sites.get_sites_by_suffix(domain_url)
             if site_info:
-                # 已存在的站点更新Cookie
-                self.sites.update_site_cookie(siteid=site_info.get("id"), cookie=cookie_str)
-                update_count += 1
+                # 检查站点连通性
+                success, _, _ = self.sites.test_connection(site_id=site_info.get("id"))
+                if not success:
+                    # 已存在且连通失败的站点更新Cookie
+                    self.sites.update_site_cookie(siteid=site_info.get("id"), cookie=cookie_str)
+                    update_count += 1
             else:
                 # 查询是否在索引器范围
                 indexer_info = self._index_helper.get_indexer_info(domain_url)
